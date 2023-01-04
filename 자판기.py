@@ -57,21 +57,68 @@ select_positon = {
 }
 
 
+#모터와 관련된 자료를 딕셔너리로 정의합니다. -------------------------
+item_motor_position = {
+1: {'motor': 'E', 'angle': 330},
+2: {'motor': 'E', 'angle': 30},
+3: {'motor': 'C', 'angle': 330},
+4: {'motor': 'C', 'angle': 30},
+5: {'motor': 'A', 'angle': 330},
+6: {'motor': 'A', 'angle': 30},
+}
+
+motors = {
+    'A' : motor_F1,
+    'C' : motor_F2,
+    'E' : motor_F3
+}
+
+
+def pop_item(n):
+
+    #아이템 번호 n 에 따른 모터의 이름과 각도를 item_motor_position 딕셔너리에 정의한 정보들로부터 가져옵니다. 
+    motor_name = item_motor_position[n]['motor']
+    motor_angle = item_motor_position[n]['angle']
+
+    #모터를 해상 상품이 나오도록 해당 각도로 움직입니다. 
+    motors[motor_name].run_to_position(motor_angle, 'shortest path', 60)
+
+    #모터를 다시 0도로 정렬합니다. 
+    motors[motor_name].run_to_position(0, 'shortest path', 60)
+
+
+
+
+
+
+
+
 class Item():
     def __init__(self, name, cost, item_number):
-        self.name = name
-        self.cost = cost
-        self.position = item_number
-        self.count = 1
-        self.draw_led_on()
+        self.name = name #상품이름
+        self.cost = cost #가격
+        self.position = item_number  #상품이 자판기 어디에 있는지 나타낸 번호
+        self.count = 1  #현재 상품의 갯수 
+        self.set_item_status() # 상품의 상태를 표시 
+
+    #현재 상품의 재고(수량)을 반환한다. 
+    def get_number_Of_item(self):
+        return self.count
 
     #이 상품의 개수를 감소 시킨다. 
-    def out_item(self):
+    def decrease_item(self):
         self.count-=1
 
     #이 상품의  이름과  남은 수량을 문자열로 반환한다. 
     def __str__(self):
         return '<'+self.name+ '=' +str(self.count)+'>'
+
+    #이 상품의 현재 상태를 led로 표시 
+    def set_item_status(self):
+        if self.count > 0 :
+            self.draw_led_on()
+        else:
+            self.draw_led_off()
 
     #이 함수를 호출하면 상품의 있을때 led를 해당 위치에 표시해준다. 
     def draw_led_on(self):
@@ -140,11 +187,12 @@ while True:
 
        #넣은 금액을 led 메트릭스에 표시합니다.
        hub.light_matrix.write(input_money)
+       wait_for_seconds(1)
+       hub.light_matrix.off()
 
        #상품의 상태를 다시 표시한다. 
        for item in items:
-           if item.count   > 0 :
-               item.draw_led_on()
+            item.set_item_status()
 
        #선택 위치를 다시 표시한다. 
        items[select_item_number-1].select_led()
@@ -159,6 +207,7 @@ while True:
         #이전에 선택한 상품을 가리킨 led를 끈다. 
         items[select_item_number-1].diselect_led()
 
+        # 현재 선택이 6번이라면 1로 초기화 한다. 아니면 상품번호는 증가시킨다.  
         if select_item_number == 6:
             select_item_number = 1
         else:
@@ -172,8 +221,22 @@ while True:
 
 
     #4. 만약 왼쪽 버튼이 눌러지고, 넣은 금액이 선택된 상품의 값보다 같으면,
-    #상품을 나오게 하고, (금액이 작거나 크면 놓은 금액을 모두 환불하고 금액을 초기화 한다.)
-    #상품이 나오면, 해당 상품 위치를 가리키는 LED를 끈다. 그리고 금액을 초기화한다.  
+    if hub.left_button.is_pressed():
+        # 소리를 냅니다. 
+        hub.speaker.beep()
+
+        #상품을 나오게 하고, (금액이 작거나 크면 놓은 금액을 모두 환불하고 금액을 초기화 한다.)
+        #상품이 나오면, 해당 상품 위치를 가리키는 LED를 끈다. 그리고 금액을 초기화한다.  
+
+        # 자판기에서 상품을 내보냅니다.
+        pop_item(select_item_number)
+
+        # 이 아이템의 수량을 하나 감소 시킵니다.
+        items[select_item_number-1].decrease_item()
+
+        #상품의 상태를 다시 표시한다.
+        for item in items:
+            item.set_item_status()
 
 
 
