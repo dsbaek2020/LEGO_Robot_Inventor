@@ -134,8 +134,11 @@ while True:
     #2. 동전이 감지되면 누적된 금액을 계산(덧셈)하고 표시 
     if coin_Color != 'not detected':
        input_money =  input_money + coin_value[coin_Color]
-
+       
+       #넣은 금액을 콘솔에 표시합니다. 
        print('Your input money = ', input_money)
+
+       #넣은 금액을 led 메트릭스에 표시합니다.
        hub.light_matrix.write(input_money)
 
     #3. 만약 오른쪽 버튼이 눌러지면 상품 선택을 합니다. 
