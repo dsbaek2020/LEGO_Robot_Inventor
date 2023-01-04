@@ -141,6 +141,16 @@ while True:
        #넣은 금액을 led 메트릭스에 표시합니다.
        hub.light_matrix.write(input_money)
 
+       #상품의 상태를 다시 표시한다. 
+       for item in items:
+           if item.count   > 0 :
+               item.draw_led_on()
+
+       #선택 위치를 다시 표시한다. 
+       items[select_item_number-1].select_led()
+
+
+
     #3. 만약 오른쪽 버튼이 눌러지면 상품 선택을 합니다. 
     if hub.right_button.is_pressed():
         # 뭔가를 합니다.
