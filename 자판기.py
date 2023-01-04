@@ -32,10 +32,10 @@ select_item_number = 1
 input_money = 0
 
 coin_value = {
-'red' : 50000,      #5만원권
-'cyan' : 10000,     #만원권
-'yellow' : 5000,    #5천원권
-'white': 1000       #천원권
+'red' : 50,      #5만원권
+'cyan' : 10,     #만원권
+'yellow' : 5,    #5천원권
+'white': 1       #천원권
 }
 
 item_led_positon = {
@@ -96,13 +96,13 @@ class Item():
 
 
 # 상품의 이름, 가격, 위치를 속성으로한 아이템 클래스의 인스턴스(객체)를 6개 선언한다. 
-#             이름                 가격     상품위치 
-item1 = Item('dualRedPin',          2,      1)
-item2 = Item('threeGear',           4,      2)
-item3 = Item('whiteTwoWheel',       6,      3)
-item4 = Item('GrayBulePin',         8,      4)
-item5 = Item('GrayBrounPin',        10,     5)
-item6 = Item('WhiteAngleAxisHole',  12,     6)
+#             이름                 가격(천원)    상품위치 
+item1 = Item('dualRedPin',          2,       1)
+item2 = Item('threeGear',           5,       2)
+item3 = Item('whiteTwoWheel',       10,      3)
+item4 = Item('GrayBulePin',         15,      4)
+item5 = Item('GrayBrounPin',        50,      5)
+item6 = Item('WhiteAngleAxisHole',  70,      6)
 
 #만들어진 아이템 클래스의 인스턴스를 모은 리스트를 만들어, 대괄호 [] 연산자로 각각 접근 하도록 한다. (if else 문 개수를 줄이기 위해서 )
 items = [item1, item2, item3 ,item4, item5, item6]
@@ -140,7 +140,7 @@ while True:
 
     #3. 만약 오른쪽 버튼이 눌러지면 상품 선택을 합니다. 
     if hub.right_button.is_pressed():
-        # 소리를 냅니다.
+        # 뭔가를 합니다.
         hub.speaker.beep()
 
         #이전에 선택한 상품을 가리킨 led를 끈다. 
