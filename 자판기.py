@@ -1,14 +1,11 @@
 #만든이: 젤리코딩학원 (백대성)
 #만든날짜: 2023. 1. 3(화)
 #수정: 1.5(목)
-
-
 from mindstorms import MSHub, Motor, MotorPair, ColorSensor, DistanceSensor, App
 from mindstorms.control import wait_for_seconds, wait_until, Timer
 from mindstorms.operator import greater_than, greater_than_or_equal_to, less_than, less_than_or_equal_to, equal_to, not_equal_to
 import math
 from random import randint, choice
-
 
 #아이템(상품)에 대한 클래스를 선언하고 정의합니다. 
 class Item():
@@ -58,8 +55,6 @@ class Item():
                                 select_positon[self.position][0], 0)
 
 
-
-
 # 여기에서 레고 마인드 스톰 하드웨어와 관련된 객체를 만듭니다. ----------------------
 #MSHub 클래스의 생성자를 호출하여 객체를 생성합니다.
 hub = MSHub()
@@ -70,10 +65,6 @@ paper_scanner = ColorSensor('D')
 motor_F3 = Motor('E')
 motor_F2 = Motor('C')
 motor_F1 = Motor('A')
-
-# 여기에서 프로그램을 작성합니다.
-hub.speaker.beep()
-
 
 #자판기 프로그램과 관련된 변수 정의를 합니다. -----------------------------------
 #아래의 코드에서는 자판기와 관련된 정보를 단일 변수 또는 딕셔너리, 리스트, 튜플로 만듭니다. 
@@ -155,8 +146,6 @@ item6 = Item('WhiteAngleAxisHole',70,    6)
 items = [item1, item2, item3 ,item4, item5, item6]
 
 
-
-
 #-------------------함수를 선언합니다. --------------------------
 
 #자판기에 동전 세개의 넣어,아래의 함수에서
@@ -195,11 +184,10 @@ def make_password():
 # 동전 3개 새로 넣어지면 이 함수는 상품을 꺼내어도 되는지 판단 처리를 합니다.
 def happy_mode():
     global pass_code_input, numOfCoin, lock
-
+    #동전의 색깔을 이어붙인 문자열을 만들어 사용자가 넣은 동전 색의 순서를 저장합니다.
     pass_code_input = pass_code_input + coin_Color
-    print('coin history =', pass_code_input)
-    print('num of coin = ', numOfCoin)
-
+    #동전을 넣은 순서를 색으로서 나타낸 값을 콘솔에 출력하고, 동전을 넣은 갯수도 표시합니다. 
+    print('coin history =', pass_code_input, 'num of coin = ', numOfCoin)
 
     #동전이 3개가 들어왔으면 아래의 코드를 실행합니다.
     if numOfCoin == 3:
@@ -231,7 +219,6 @@ def happy_mode():
         else:
             # 'Ha Ha Ha' 사운드를 재생하고 완료될 때까지 기다립니다
             hub.speaker.play_sound('Ha Ha Ha')
-
         #어떤 색으로 된 동전을 넣었는지를 나타내는 아래의 변수를 초기화합니다.(동전 3개까지만 기록)
         pass_code_input = ''
 
@@ -248,10 +235,8 @@ def check_Coin():
     else:
         return 'not detected'
 
-
 #모터를 회전하여 아이템을 자판기에서 꺼내는 함수를 정의합니다.
 def pop_item(n):
-
     #아이템 번호 n 에 따른 모터의 이름과 각도를 item_motor_position 딕셔너리에 정의한 정보들로부터 가져옵니다.
     motor_name = item_motor_position[n]['motor']
     motor_angle = item_motor_position[n]['angle']
@@ -261,7 +246,6 @@ def pop_item(n):
 
     #모터를 다시 0도로 정렬합니다.
     motors[motor_name].run_to_position(0, 'shortest path', 60)
-
 
 #하나의 아이템을 꺼내고 아이템의 수량을 1 감소시키는 함수입니다.
 def pop_one_item(n):
@@ -281,9 +265,10 @@ def pop_one_item(n):
     for item in items:
         item.set_item_status()
 
-
-
 #<<<<<<<<-----------프로그램을 시작합니다. ------------->>>>
+# 삐~~하는 부팅음을 소리냅니다. 
+hub.speaker.beep()
+
 # 모터를 0도 위치로 작동합니다.
 motor_F3.run_to_position(0, 'shortest path', 20)
 motor_F2.run_to_position(0, 'shortest path', 20)
@@ -293,60 +278,45 @@ items[select_item_number-1].select_led()
 #암호를 설정합니다.
 make_password()
 
-
 while True:
-
     #1. 동전이 들어 왔는지 또는 아닌지 확인한다.
-    coin_Color = check_Coin()
-    
-    #2. 동전이 감지되면 누적된 금액을 계산(덧셈)하고 표시
+    coin_Color = check_Coin()   
+    #2. 동전이 감지되면 누적된 금액을 계산(덧셈)하고 표시합니다.
     if coin_Color != 'not detected':
+        #총금액을 계산해 줍니다. 
         input_money =input_money + coin_value[coin_Color]
-
         #들어온 동전을 누적하여 기록하기 위한 문자열을 갱신한다.
         numOfCoin  +=1
         #행운의 당첨이 된건지 확인하는 함수를 호출합니다.
         happy_mode()
-
-
-
         #넣은 금액을 콘솔에 표시합니다.
         print('Your input money = ', input_money)
 
         #넣은 금액을 led 메트릭스에 표시합니다.
         hub.light_matrix.write(input_money)
         wait_for_seconds(1)
+        #허브의 LED 전부 지웁니다.
         hub.light_matrix.off()
-
-        #상품의 상태를 다시 표시한다.
+        #상품의 상태를 다시 표시한다. (점이 사라지면 상품은 없음을 의미함)
         for item in items:
                 item.set_item_status()
-
-        #선택 위치를 다시 표시한다.
+        #커서의 위치를 다시 표시합니다.
         items[select_item_number-1].select_led()
-
-
 
     #3. 만약 오른쪽 버튼이 눌러지면 상품 선택을 합니다.
     if hub.right_button.is_pressed():
         # 뭔가를 합니다.
         hub.speaker.beep()
-
         #이전에 선택한 상품을 가리킨 led를 끈다.
         items[select_item_number-1].diselect_led()
-
+        # 커서의 선택이 6번을 넘기지 않기 위해서 
         # 현재 선택이 6번이라면 1로 초기화 한다. 아니면 상품번호는 증가시킨다.
         if select_item_number == 6:
             select_item_number = 1
         else:
             select_item_number+=1
-
         #현재 선택된 상품을 표시한다.
         items[select_item_number-1].select_led()
-
-
-
-
 
     #4. 만약 왼쪽 버튼이 눌러지고, 넣은 금액이 선택된 상품의 값보다 같으면, 싱품이 나오도록 하세요.
     # 다르면, 동전을 밖으로 꺼내고 상품은 나오지 않도록 하세요
@@ -361,8 +331,6 @@ while True:
             pop_one_item(select_item_number)
         '''
         
-
-
     # 우연히 넣은 동전 3개가 암호와 같으면 자판기는 1에서6번 상품중에 하나를 밖으로 꺼내어 줍니다. 
     if lock == 'off':
         hub.speaker.beep()
